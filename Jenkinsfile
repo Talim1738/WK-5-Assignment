@@ -18,17 +18,20 @@ pipeline {
                 echo 'Building the project...'
             }
         }
+    }
+
       node {
   stage('SCM') {
     checkout scm
   }
+      }
   stage('SonarQube Analysis') {
     def mvn = tool 'Default Maven';
     withSonarQubeEnv() {
       bat "${mvn}/bin/mvn clean verify sonar: sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
     }
   }
-}
+
         stage('Quality Gate') {
             steps {
                 waitForQualityGate abortPipeline: true
@@ -37,6 +40,7 @@ pipeline {
             steps {
                 echo 'Running tests...'
             }
+        }
         }
         stage('Deploy Stage') {
             steps {
@@ -48,5 +52,4 @@ pipeline {
                 echo 'Releasing the Application...'
             }
         }
-    }
-}
+    
