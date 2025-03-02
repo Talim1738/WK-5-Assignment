@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Building Stage') {
             steps {
-               bat echo 'Building the project...'
+                echo 'Building the project...'
             }
         }
         stage('SonarQube Analysis') {
@@ -16,7 +16,8 @@ pipeline {
                 script {
                     // Run SonarQube scanner for analysis
                     withSonarQubeEnv(SONARQUBE_SERVER) {
-                        sonar-scanner.bat -D"sonar.projectKey=task1" -D"sonar.sources=." -D"sonar.host.url=http://localhost:9000" -D"sonar.token=sqp_956251bbf18789772ace164c164fbf64a10b6b21"
+                      bat 'mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.host.url=http://your-sonarqube-url -Dsonar.login=your-sonar-token'
+
                     }
                 }
             }
