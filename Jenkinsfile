@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Building Stage') {
             steps {
-                echo 'Building the project...'
+               bat echo 'Building the project...'
             }
         }
         stage('SonarQube Analysis') {
