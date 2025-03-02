@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    stages {
+        stage ('Clone Sources')
+            steps {
+                git URL: 'https://github.com/Talim1738/WK-5-Assignment.git'
+            }
+    }
+
     environment {
         SONARQUBE_SERVER = 'SonarQube'
     }
@@ -11,28 +18,20 @@ pipeline {
                 echo 'Building the project...'
             }
         }
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    // Run SonarQube scanner for analysis
-                    withSonarQubeEnv(SONARQUBE_SERVER) {
-                        bat 'mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.host.url=http://localhost:9000 -Dsonar.login=task1'
-                    }
-                }
-            }
-        }
+      node {
+  stage('SCM') {
+    checkout scm
+  }
+  stage('SonarQube Analysis') {
+    def mvn = tool 'Default Maven';
+    withSonarQubeEnv() {
+      bat "${mvn}/bin/mvn clean verify sonar: sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
+    }
+  }
+}
         stage('Quality Gate') {
             steps {
-                script {
-                    // Check quality gate status
-                    timeout(time: 1, unit: 'HOURS') {
-                        def qualityGate = waitForQualityGate()
-                        if (qualityGate.status != 'OK') {
-                            error "Pipeline failed due to quality gate failure: ${qualityGate.status}"
-                        }
-                    }
-                }
-            }
+                waitForQualityGate abortPipeline: true
         }
         stage('Testing Stage') {
             steps {
