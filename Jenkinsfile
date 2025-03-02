@@ -16,7 +16,7 @@ pipeline {
                 script {
                     // Run SonarQube scanner for analysis
                     withSonarQubeEnv(SONARQUBE_SERVER) {
-                        sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.host.url=http://localhost:9000 -Dsonar.login=task1'
+                        bat 'mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.host.url=http://localhost:9000 -Dsonar.login=task1'
                     }
                 }
             }
