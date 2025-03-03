@@ -8,8 +8,8 @@ pipeline {
     stages {
         stage('Clone Sources') {
             steps {
-                git url: 'https://github.com/Talim1738/WK-5-Assignment.git'
-                git branch: 'main'
+                
+                git branch: 'main', url: 'https://github.com/Talim1738/WK-5-Assignment.git'
             }
         }
 
@@ -24,7 +24,12 @@ pipeline {
                 script {
                     def mvn = tool 'Default Maven'
                     withSonarQubeEnv('SonarQube') {
-                        bat "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
+                        
+                        if (isUnix()) {
+                            sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
+                        } else {
+                            bat "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
+                        }
                     }
                 }
             }
