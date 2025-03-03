@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        SONAR_TOKEN = credentials('450ff82a-378b-4fa0-978f-00b173cce8b7')
+        SONAR_TOKEN = credentials('task1')
     }
     stages {
         stage('Checkout SCM') {
@@ -18,7 +18,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat "mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.login=${env.sqp_a7358dd58582a6e68b08d1d7e6a24f8259065739}"
+                    bat "mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.login=${env.628ca0f1-ae75-49bd-a997-a7a7e59b3139}"
                 }
             }
         }
