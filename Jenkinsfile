@@ -23,7 +23,7 @@ pipeline {
                 script {
                     def mvn = tool name: 'maven3' // Removed the type parameter
 
-                    withSonarQubeEnv("${SONARQUBE_SERVER}") { // Use the environment variable SONARQUBE_SERVER
+                    withSonarQubeEnv("${SonarQube}") { // Use the environment variable SONARQUBE_SERVER
                         if (isUnix()) {
                             sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
                         } else {
