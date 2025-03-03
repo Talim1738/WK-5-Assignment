@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    environment {
+        SONAR_TOKEN = credentials('450ff82a-378b-4fa0-978f-00b173cce8b7')
+    }
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                // Add your build steps here
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat "mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.login=${env.sqp_a7358dd58582a6e68b08d1d7e6a24f8259065739}"
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                script {
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    }
+                }
+            }
+        }
+    }
+}
