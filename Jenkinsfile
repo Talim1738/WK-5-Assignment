@@ -2,13 +2,12 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_SERVER = 'SonarQube'
+        SONARQUBE_SERVER = 'SonarQube' // Reuse this variable in withSonarQubeEnv
     }
 
     stages {
         stage('Clone Sources') {
             steps {
-                
                 git branch: 'main', url: 'https://github.com/Talim1738/WK-5-Assignment.git'
             }
         }
@@ -22,13 +21,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def mvn = tool 'maven3' , type: 'maven'
-                    withSonarQubeEnv('SonarQube') {
-                        
+                    def mvn = tool name: 'maven3' // Removed the type parameter
+
+                    withSonarQubeEnv("${SONARQUBE_SERVER}") { // Use the environment variable SONARQUBE_SERVER
                         if (isUnix()) {
                             sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
                         } else {
-                            bat "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
+                            bat "${mvn}\\bin\\mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
                         }
                     }
                 }
