@@ -9,6 +9,7 @@ pipeline {
         stage('Clone Sources') {
             steps {
                 git url: 'https://github.com/Talim1738/WK-5-Assignment.git'
+                git branch: 'main'
             }
         }
 
