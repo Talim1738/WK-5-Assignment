@@ -18,7 +18,43 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat "mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.login=${env.628ca0f1-ae75-49bd-a997-a7a7e59b3139}"
+                    bat "mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.login=nicolas -Dsonar.password=pipeline {
+    agent any
+    environment {
+        SONAR_TOKEN = credentials('task1')
+    }
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                // Add your build steps here
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat "mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.login=nicolas -Dsonar.password=sqp_a7358dd58582a6e68b08d1d7e6a24f8259065739"
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                script {
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    }
+                }
+            }
+        }
+    }
+}
+"
                 }
             }
         }
