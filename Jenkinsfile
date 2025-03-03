@@ -22,7 +22,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def mvn = tool 'maven3'
+                    def mvn = tool 'maven3' , type: 'maven'
                     withSonarQubeEnv('SonarQube') {
                         
                         if (isUnix()) {
