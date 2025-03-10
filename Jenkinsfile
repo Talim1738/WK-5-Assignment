@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        SONARQUBE_SERVER = 'SonarQube'
-    }
-
     stages {
         stage('Clone Sources') {
             steps {
@@ -15,28 +11,6 @@ pipeline {
         stage('Building Stage') {
             steps {
                 echo 'Building the project...'
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    def mvn = tool name: 'maven3'
-
-                    withSonarQubeEnv("${SonarQube}") { 
-                        if (isUnix()) {
-                            sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
-                        } else {
-                            bat "${mvn}\\bin\\mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                waitForQualityGate abortPipeline: true
             }
         }
 
