@@ -11,9 +11,9 @@ pipeline {
         stage('Verify Ansible is Installed') {
             steps {
                 script {
-                    // Check if ansible is installed
-                    sh '''
-                        if ! command -v ansible-playbook &> /dev/null; then
+                    // Check if ansible and ansible-playbook are installed using WSL
+                    bat '''
+                        wsl if ! command -v ansible &> /dev/null || ! command -v ansible-playbook &> /dev/null; then
                             echo "Ansible is not installed. Failing the build."
                             exit 1
                         fi
@@ -25,8 +25,8 @@ pipeline {
         stage('Verify Playbook Exists') {
             steps {
                 script {
-                    // Search for playbook.yml in the workspace and fail if not found
-                    def playbookExists = sh(script: 'test -f playbook.yml', returnStatus: true)
+                    // Check if playbook.yml exists using WSL
+                    def playbookExists = bat(script: 'wsl test -f playbook.yml', returnStatus: true)
                     if (playbookExists != 0) {
                         error 'playbook.yml not found. Failing the build.'
                     }
@@ -34,19 +34,19 @@ pipeline {
             }
         }
 
-        stage('Building Stage') {
+        stage('Build') {
             steps {
                 echo 'Building the project...'
             }
         }
 
-        stage('Testing Stage') {
+        stage('Test') {
             steps {
                 echo 'Running tests...'
             }
         }
 
-        stage('Deploy Stage') {
+        stage('Deploy') {
             steps {
                 echo 'Deploying application...'
             }
@@ -55,15 +55,15 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 script {
-                    // Run the ansible-playbook command
-                    sh 'ansible-playbook playbook.yml'
+                    // Run ansible-playbook within WSL
+                    bat 'wsl ansible-playbook playbook.yml'
                 }
             }
         }
 
-        stage('Releasing Stage') {
+        stage('Release') {
             steps {
-                echo 'Releasing the Application...'
+                echo 'Releasing the application...'
             }
         }
     }
