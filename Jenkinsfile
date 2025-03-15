@@ -8,11 +8,28 @@ pipeline {
             }
         }
 
+        stage('Verify Ansible is Installed') {
+            steps {
+                script {
+                    // Check if ansible is installed
+                    sh '''
+                        if ! command -v ansible-playbook &> /dev/null; then
+                            echo "Ansible is not installed. Failing the build."
+                            exit 1
+                        fi
+                    '''
+                }
+            }
+        }
+
         stage('Verify Playbook Exists') {
             steps {
                 script {
-                    // Search for playbook.yml in the workspace
-                    sh 'find . -name "playbook.yml"'
+                    // Search for playbook.yml in the workspace and fail if not found
+                    def playbookExists = sh(script: 'test -f playbook.yml', returnStatus: true)
+                    if (playbookExists != 0) {
+                        error 'playbook.yml not found. Failing the build.'
+                    }
                 }
             }
         }
@@ -38,7 +55,7 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 script {
-                    // Run the ansible-playbook command if playbook.yml is found
+                    // Run the ansible-playbook command
                     sh 'ansible-playbook playbook.yml'
                 }
             }
