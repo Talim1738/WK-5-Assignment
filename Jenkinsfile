@@ -26,6 +26,15 @@ pipeline {
             }
         }
 
+        stage('Run Ansible Playbook') {
+            steps {
+                script {
+                    
+                    sh 'ansible-playbook playbook.yml'
+                }
+            }
+        }
+
         stage('Releasing Stage') {
             steps {
                 echo 'Releasing the Application...'
