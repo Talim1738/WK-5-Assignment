@@ -8,6 +8,15 @@ pipeline {
             }
         }
 
+        stage('Verify Playbook Exists') {
+            steps {
+                script {
+                    // Search for playbook.yml in the workspace
+                    sh 'find . -name "playbook.yml"'
+                }
+            }
+        }
+
         stage('Building Stage') {
             steps {
                 echo 'Building the project...'
@@ -29,7 +38,7 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 script {
-                    
+                    // Run the ansible-playbook command if playbook.yml is found
                     sh 'ansible-playbook playbook.yml'
                 }
             }
