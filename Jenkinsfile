@@ -1,6 +1,16 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Default Maven'
+        jdk 'JDK 17'
+        // SonarScanner for .NET is already defined in environment
+    }
+
+    environment {
+        scannerHome = tool 'SonarScanner for .NET'
+    }
+
     stages {
         stage('Clone Sources') {
             steps {
@@ -14,41 +24,23 @@ pipeline {
             }
         }
 
-        node {
-  stage('SCM') {
-    checkout scm
-  }
-  stage('SonarQube Analysis') {
-    def scannerHome = tool 'SonarScanner for .NET'
-    withSonarQubeEnv() {
-      bat "dotnet ${scannerHome}\\SonarScanner.MSBuild.dll begin /k:\"task1\""
-      bat "dotnet build"
-      bat "dotnet ${scannerHome}\\SonarScanner.MSBuild.dll end"
-    }
-  }
-}
-plugins {
-  id "org.sonarqube" version "6.0.1.5171"
-}
+        stage('SonarQube Analysis (.NET)') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat "${env.scannerHome}\\SonarScanner.MSBuild.dll begin /k:\"task1\""
+                    bat 'dotnet build'
+                    bat "${env.scannerHome}\\SonarScanner.MSBuild.dll end"
+                }
+            }
+        }
 
-sonar {
-  properties {
-    property "sonar.projectKey", "task1"
-    property "sonar.projectName", "task1"
-  }
-}
-
-        node {
-  stage('SCM') {
-    checkout scm
-  }
-  stage('SonarQube Analysis') {
-    def mvn = tool 'Default Maven';
-    withSonarQubeEnv() {
-      sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
-    }
-  }
-}
+        stage('SonarQube Analysis (Maven)') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "${tool 'Default Maven'}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
+                }
+            }
+        }
 
         stage('Test') {
             steps {
