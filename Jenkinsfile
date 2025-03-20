@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Default Maven'
-        jdk 'JDK 17'
+        maven 'maven3'
+        jdk 'JDK 21'
         // SonarScanner for .NET is already defined in environment
     }
 
