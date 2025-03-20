@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven 'maven3'
-        jdk 'JDK 21'
+        jdk 'JDK21'
         // SonarScanner for .NET is already defined in environment
     }
 
