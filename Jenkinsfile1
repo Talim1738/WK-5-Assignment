@@ -1,70 +1,44 @@
 pipeline {
     agent any
+
     environment {
-        SONAR_TOKEN = credentials('task1')
+        SONAR_TOKEN = credentials('SONAR_TOKEN') 
     }
+
     stages {
-        stage('Checkout SCM') {
+        stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/Talim1738/WK-5-Assignment.git'
             }
         }
-        stage('Build') {
+
+        stage('Build and Test') {
             steps {
-                echo 'Building the project...'
-                // Add your build steps here
+                bat './gradlew build'
             }
         }
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    bat "mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.login=nicolas -Dsonar.password=pipeline {
-    agent any
-    environment {
-        SONAR_TOKEN = credentials('task1')
-    }
-    stages {
-        stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
-        stage('Build') {
-            steps {
-                echo 'Building the project...'
-                // Add your build steps here
-            }
-        }
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    bat "mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.login=nicolas -Dsonar.password=sqp_a7358dd58582a6e68b08d1d7e6a24f8259065739"
-                }
-            }
-        }
-        stage('Quality Gate') {
+
+        stage('Check Sonar Token') {
             steps {
                 script {
-                    def qg = waitForQualityGate()
-                    if (qg.status != 'OK') {
-                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    if (SONAR_TOKEN) {
+                        echo "✅ SONAR_TOKEN is set. First 5 chars: ${SONAR_TOKEN.take(5)}******"
+                    } else {
+                        error "❌ SONAR_TOKEN is NOT set! Check Jenkins credentials."
                     }
                 }
+                bat "echo SONAR_TOKEN Windows: ***** (hidden for security)"
             }
         }
-    }
-}
-"
-                }
-            }
-        }
-        stage('Quality Gate') {
+
+        stage('SonarQube Analysis') {
             steps {
-                script {
-                    def qg = waitForQualityGate()
-                    if (qg.status != 'OK') {
-                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                withSonarQubeEnv('SonarScanner') { // Assure-toi que 'SonarScanner' est bien défini dans Jenkins
+                    script {
+                        echo "🚀 Running SonarQube Analysis..."
                     }
+                   bat './gradlew sonar -Dsonar.token=squ_d0728f3999a68e05f52b8b8bd30e8700348f7f7f'
+
                 }
             }
         }
