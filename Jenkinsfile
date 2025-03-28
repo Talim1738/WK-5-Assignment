@@ -1,62 +1,46 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'maven3'
-        jdk 'jdk21'
-        // SonarScanner for .NET is already defined in environment
-    }
-
     environment {
-        scannerHome = tool 'SonarScanner for .NET'
+        SONARQUBE_URL = 'http://localhost:9000'
+        SONARQUBE_TOKEN = credentials('sonarway') // Store the token in Jenkins Credentials
     }
 
     stages {
-        stage('Clone Sources') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Talim1738/WK-5-Assignment.git'
+                git 'https://github.com/Talim1738/WK-5-Assignment.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building the project...'
+                sh 'mvn clean package'
             }
         }
 
-        stage('SonarQube Analysis (.NET)') {
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat "${env.scannerHome}\\SonarScanner.MSBuild.dll begin /k:\"task1\""
-                    bat 'dotnet build'
-                    bat "${env.scannerHome}\\SonarScanner.MSBuild.dll end"
+                    sh """
+                        mvn clean verify sonar:sonar \
+                        -Dsonar.projectKey=Sonar \
+                        -Dsonar.projectName='Sonar' \
+                        -Dsonar.host.url=$SONARQUBE_URL \
+                        -Dsonar.token=$SONARQUBE_TOKEN
+                    """
                 }
             }
         }
 
-        stage('SonarQube Analysis (Maven)') {
+        stage('Quality Gate') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh "${tool 'Default Maven'}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=task1 -Dsonar.projectName='task1'"
+                script {
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'OK') {
+                        error "Pipeline failed due to quality gate failure: ${qg.status}"
+                    }
                 }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying application...'
-            }
-        }
-
-        stage('Release') {
-            steps {
-                echo 'Releasing the application...'
             }
         }
     }
