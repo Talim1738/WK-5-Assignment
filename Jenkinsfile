@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SONARQUBE_URL = 'http://localhost:9000'
-        SONARQUBE_TOKEN = credentials('sonarway') // Store the token in Jenkins Credentials
+        SONARQUBE_TOKEN = credentials('sonarqube-token') // Store the token in Jenkins Credentials
     }
 
     stages {
