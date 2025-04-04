@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                bat 'echo Building...'
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'echo Testing...'
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                bat 'echo Analyzing...'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                bat 'echo Deploying...'
+            }
+        }
+    }
+}
